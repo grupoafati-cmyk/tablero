@@ -214,7 +214,7 @@ footer{color:var(--faint);font-size:12px;text-align:center;padding:24px 0 40px}
     </div>
   </header>
   <main class="wrap" id="vista"></main>
-  <footer class="wrap">Grupo AFATI · Datos de Instagram, Facebook y YouTube vía n8n · TikTok y negocio desde la hoja del playbook</footer>
+  <footer class="wrap">Grupo AFATI · Datos de Instagram, Facebook, YouTube y TikTok vía n8n · datos de negocio desde la hoja del playbook</footer>
 </div>
 
 <script>
@@ -336,7 +336,7 @@ function resumen() {
   const seg = ms.reduce((a, [, m]) => a + seguidores(m), 0);
   let h = `<div class="grid g-kpi">
     ${kpi('Vistas', corto(t.vistas), 'todas las redes')}
-    ${kpi('Seguidores', fmt(seg), 'IG + FB + YouTube')}
+    ${kpi('Seguidores', fmt(seg), 'IG + FB + YouTube + TikTok')}
     ${kpi('Videos publicados', fmt(t.publicados), `${vids.filter((v) => !v.posts.length).length} en proceso`)}
     ${kpi('Interacción', pct(t.inter), 'likes + coment. + guard. + comp. / vistas')}
     ${kpi('Compartidos', t.cx1000 == null ? '—' : t.cx1000.toFixed(1), 'por cada 1,000 vistas')}
@@ -359,7 +359,7 @@ function resumen() {
     <div class="card"><h2>Vistas por red</h2>${barras(redes.map(([k, x]) => ({ nombre: `${RED[k]?.[0] || k} · ${x.posts} publicaciones`, total: x.vistas, color: RED[k]?.[1] })))}
       <p class="nota" style="margin:12px 0 0">${redes.length ? 'Promedio por publicación: ' + redes.map(([k, x]) => `${RED[k]?.[0] || k} ${fmt(x.vistas / x.posts)}`).join(' · ') : ''}</p></div>
     <div class="card"><h2>Seguidores por red</h2>${barras(ms.flatMap(([, m]) => ['instagram', 'facebook', 'youtube', 'tiktok'].filter((x) => m.cuentas[x]).map((x) => ({ nombre: `${ms.length > 1 ? m.nombre + ' · ' : ''}${RED[x][0]}`, total: m.cuentas[x].seguidores, color: RED[x][1] }))))}
-      <p class="nota" style="margin:12px 0 0">TikTok: se captura a mano mientras la app está en Sandbox.</p></div>
+      ${ms.some(([, m]) => !m.cuentas.tiktok) ? '<p class="nota" style="margin:12px 0 0">TikTok aparece cuando la cuenta se reconecta con permisos de estadísticas.</p>' : ''}</div>
   </div></section>`;
 
   // Top videos
@@ -378,7 +378,7 @@ function resumen() {
   const series = [];
   for (const [, m] of ms) {
     const dias = Object.keys(m.historial || {}).sort();
-    if (dias.length) series.push({ nombre: m.nombre + ' · seguidores', color: m.color, puntos: dias.map((d) => [new Date(d).getTime(), ['ig', 'fb', 'yt'].reduce((a, r) => a + (m.historial[d][r] || 0), 0)]) });
+    if (dias.length) series.push({ nombre: m.nombre + ' · seguidores', color: m.color, puntos: dias.map((d) => [new Date(d).getTime(), ['ig', 'fb', 'yt', 'tt'].reduce((a, r) => a + (m.historial[d][r] || 0), 0)]) });
   }
   const nDias = Math.max(0, ...series.map((s) => s.puntos.length));
   h += `<section><div class="card"><div class="sec-h"><h2>Crecimiento</h2><span class="nota">${nDias} día(s) registrados</span></div>${nDias > 1 ? lineas(series, { xLbl: (x) => fecha(x) }) : '<div class="vacio">El crecimiento se dibuja a partir del segundo día de datos. Cada vez que se actualiza el tablero se guarda una foto de los seguidores.</div>'}</div></section>`;
