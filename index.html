@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Tablero AFATI</title>
+<meta name="theme-color" content="#08101a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f2f2f3'/%3E%3Cpath d='M22 23h32v12H34v20H22z' fill='%235980a6'/%3E%3Cpath d='M78 77H46V65h20V45h12z' fill='%232c455d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2f2f3; --surface:#ffffff; --surface-2:#e9e9ea; --text:#1d1f20; --muted:#5d5d60; --faint:#98989b;
+  --line:color-mix(in srgb,#1d1f20 14%,transparent);
+  --accent:#5980a6; --accent-strong:#2c455d; --accent-soft:#eef6ff; --accent-mid:#d6ebff;
+  --electric:#1e6bff; --cyan:#38bdf8;
+  --ok:#2e8b57; --warn:#b7791f; --bad:#c0392b;
+  --s-afati:#5980a6; --s-ostara:#c2399a; --s-ig:#c13584; --s-fb:#1877f2; --s-yt:#e62117; --s-tt:#1d1f20;
+  --radius:4px; --shadow:0 1px 2px rgba(8,16,26,.06),0 6px 24px -12px rgba(8,16,26,.18);
+  --font-body:"Barlow",system-ui,sans-serif; --font-head:"Barlow Condensed",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08101a; --surface:#0e131a; --surface-2:#141c27; --text:#e8eaed; --muted:#9fb0c3; --faint:#5d6b7b;
+  --line:color-mix(in srgb,#c3d7ea 14%,transparent);
+  --accent:#78a3cc; --accent-strong:#c3d7ea; --accent-soft:#122235; --accent-mid:#1d2d3d;
+  --s-afati:#78a3cc; --s-ostara:#e06bbd; --s-tt:#e8eaed; --shadow:none;
+}}
+:root[data-theme="dark"]{
+  --bg:#08101a; --surface:#0e131a; --surface-2:#141c27; --text:#e8eaed; --muted:#9fb0c3; --faint:#5d6b7b;
+  --line:color-mix(in srgb,#c3d7ea 14%,transparent);
+  --accent:#78a3cc; --accent-strong:#c3d7ea; --accent-soft:#122235; --accent-mid:#1d2d3d;
+  --s-afati:#78a3cc; --s-ostara:#e06bbd; --s-tt:#e8eaed; --shadow:none;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--font-body);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.eyebrow{font:600 12px/1 var(--font-head);letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--font-head);font-weight:600;letter-spacing:.02em;margin:0;line-height:1.1}
+h2{font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.logo{display:inline-block;width:28px;height:28px;flex:none}
+
+/* --- acceso --- */
+#acceso{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:
+  linear-gradient(135deg,transparent 0 60%,color-mix(in srgb,var(--accent) 10%,transparent) 60% 100%),var(--bg)}
+.caja{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:32px 28px;box-shadow:var(--shadow)}
+.caja h1{font-size:34px;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 6px}
+.caja p{color:var(--muted);margin:0 0 22px;font-size:15px}
+label.campo{display:block;font:600 12px var(--font-head);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input[type=password]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);color:var(--text);font:inherit;outline:none}
+input[type=password]:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);margin:14px 0 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius);background:var(--accent-strong);color:#fff;padding:12px 18px;font:600 14px var(--font-head);letter-spacing:.16em;text-transform:uppercase;width:100%}
+:root[data-theme="dark"] .btn{color:#08101a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#08101a}}
+.btn:hover{filter:brightness(1.1)}
+.error{color:var(--bad);font-size:14px;min-height:20px;margin-top:10px}
+
+/* --- encabezado --- */
+header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.barra{display:flex;align-items:center;gap:12px;height:60px}
+.marca-t{display:flex;align-items:center;gap:10px;font:600 18px var(--font-head);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.marca-t small{font:500 12px var(--font-body);letter-spacing:0;text-transform:none;color:var(--faint)}
+.esp{flex:1}
+.icono{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius)}
+.icono svg{width:18px;height:18px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font:600 13px var(--font-head);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.chip .pt{width:8px;height:8px;border-radius:50%}
+.chip[aria-pressed=true]{background:var(--accent-strong);border-color:var(--accent-strong);color:#fff}
+:root[data-theme="dark"] .chip[aria-pressed=true]{color:#08101a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed=true]{color:#08101a}}
+.chip em{font-style:normal;font-weight:500;opacity:.7;letter-spacing:.04em;text-transform:none;font-family:var(--font-body);font-size:12px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:none;background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;font:600 14px var(--font-head);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+nav.tabs button[aria-selected=true]{color:var(--text);border-bottom-color:var(--accent)}
+main{padding:24px 0 64px}
+.aviso{background:color-mix(in srgb,var(--warn) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);border-radius:var(--radius);padding:10px 14px;font-size:14px;margin-bottom:20px}
+
+/* --- tarjetas y KPIs --- */
+.grid{display:grid;gap:16px}
+.g-kpi{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.g-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:0}
+.kpi .lbl{font:600 12px var(--font-head);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font:600 36px/1.1 var(--font-head);margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:13px;color:var(--faint)}
+.kpi{position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-1px;top:-1px;width:18px;height:18px;border-top:4px solid var(--accent);border-right:4px solid var(--accent);opacity:.5}
+section{margin-top:28px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sec-h h2{margin:0}
+.nota{font-size:13px;color:var(--faint)}
+
+/* comparativa de marcas */
+.marca-card{border-left:4px solid var(--c)}
+.marca-card h3{font-size:24px;text-transform:uppercase;letter-spacing:.06em}
+.tag{display:inline-block;font:600 11px var(--font-head);letter-spacing:.14em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.mini b{display:block;font:600 22px var(--font-head);font-variant-numeric:tabular-nums}
+.mini span{font-size:12px;color:var(--muted)}
+
+/* gráficas */
+.chart{width:100%;display:block;overflow:visible}
+.chart text{font:500 11px var(--font-body);fill:var(--muted)}
+.chart .grid-l{stroke:var(--line)}
+.leyenda{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:8px}
+.leyenda i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.barras{display:flex;flex-direction:column;gap:10px}
+.barra-f{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:14px}
+.barra-f .pista{grid-column:1/-1;height:8px;background:var(--surface-2);border-radius:2px;overflow:hidden;display:flex}
+.barra-f .pista span{display:block;height:100%}
+.barra-f b{font-variant-numeric:tabular-nums;font-weight:600}
+.barra-f .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* contenido */
+.embudo{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.paso{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 10px;text-align:center}
+.paso b{display:block;font:600 28px var(--font-head)}
+.paso span{font:600 11px var(--font-head);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.paso.on{border-color:var(--accent);background:var(--accent-soft)}
+@media (max-width:640px){.embudo{grid-template-columns:repeat(3,1fr)}}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.filtros select{padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);color:var(--text);font:inherit;font-size:14px}
+.videos{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.vid{display:flex;flex-direction:column;padding:0;overflow:hidden}
+.vid .thumb{aspect-ratio:4/3;background:linear-gradient(135deg,var(--accent-mid),var(--surface-2));position:relative;overflow:hidden}
+.vid .thumb img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block}
+.vid .thumb .sin{position:absolute;inset:0;display:grid;place-items:center}
+.vid .thumb .sin svg{width:46px;height:46px;opacity:.55}
+.vid .estado{position:absolute;left:10px;top:10px}
+.vid .marca-b{position:absolute;right:10px;top:10px;background:var(--c);color:#fff;font:600 11px var(--font-head);letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.vid .cuerpo{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.vid h3{font-size:19px;letter-spacing:.01em;line-height:1.2}
+.etqs{display:flex;flex-wrap:wrap;gap:6px}
+.etq{font-size:12px;padding:2px 8px;border-radius:var(--radius);background:var(--surface-2);color:var(--muted)}
+.etq b{font-weight:600;color:var(--text)}
+.e-Publicado{background:var(--ok);color:#fff}.e-Aprobado{background:var(--electric);color:#fff}.e-Revisado,.e-Producido{background:var(--accent);color:#fff}.e-Guion,.e-Idea{background:var(--surface-2);color:var(--muted)}
+.redes{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.redes th{font:600 11px var(--font-head);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);text-align:right;padding:4px 0;border-bottom:1px solid var(--line)}
+.redes th:first-child,.redes td:first-child{text-align:left}
+.redes td{text-align:right;padding:5px 0;border-bottom:1px solid var(--line)}
+.redes tr:last-child td{border-bottom:0}
+.red-i{display:inline-flex;align-items:center;gap:6px}
+.red-i i{width:8px;height:8px;border-radius:50%}
+.vid .pie{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-top:auto;padding-top:4px}
+.vid .pie b{color:var(--text);font-weight:600}
+
+/* recomendaciones */
+.recs{display:grid;gap:12px}
+.rec{display:grid;grid-template-columns:auto 1fr;gap:14px;border-left:4px solid var(--rc)}
+.rec>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rec .ti{font:600 11px var(--font-head);letter-spacing:.14em;text-transform:uppercase;color:var(--rc);writing-mode:vertical-rl;transform:rotate(180deg);align-self:stretch;text-align:center}
+.rec h3{font-size:19px}
+.rec p{margin:0;color:var(--text);font-size:15px}
+.rec .ev{font-size:13px;color:var(--faint)}
+.rec .quien{font:600 11px var(--font-head);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.t-arregla{--rc:var(--bad)}.t-repite{--rc:var(--ok)}.t-prueba{--rc:var(--electric)}.t-organiza{--rc:var(--warn)}.t-dato{--rc:var(--accent)}
+.md h3{font-size:20px;text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px;color:var(--accent-strong)}
+.md h3:first-child{margin-top:0}
+.md h4{font:600 16px var(--font-head);letter-spacing:.06em;margin:16px 0 6px}
+.md ul{margin:0;padding-left:18px}.md li{margin:5px 0}
+.md p{margin:8px 0}
+.md code{background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:.9em}
+.vacio{color:var(--faint);font-size:14px;padding:12px 0}
+footer{color:var(--faint);font-size:12px;text-align:center;padding:24px 0 40px}
+@media (max-width:520px){.kpi .val{font-size:30px}.marca-t small{display:none}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 100 100"><path d="M22 23h32v12H34v20H22z" fill="#5980a6"/><path d="M78 77H46V65h20V45h12z" fill="currentColor"/></symbol>
+</svg>
+
+<div id="acceso">
+  <form class="caja" id="f-acceso" autocomplete="on">
+    <svg class="logo" style="width:44px;height:44px;color:var(--accent-strong)" aria-hidden="true"><use href="#logo"/></svg>
+    <h1>Tablero de contenido</h1>
+    <p>Números, contenido y recomendaciones de AFATI y sus clientes.</p>
+    <input type="text" name="username" value="tablero" autocomplete="username" hidden>
+    <label class="campo" for="clave">Contraseña</label>
+    <input type="password" id="clave" name="password" autocomplete="current-password" required autofocus>
+    <label class="check"><input type="checkbox" id="recordar" checked> Recordar en este dispositivo</label>
+    <button class="btn" type="submit">Entrar</button>
+    <div class="error" id="err" role="alert"></div>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="barra">
+        <div class="marca-t"><svg class="logo" style="color:var(--accent-strong)" aria-hidden="true"><use href="#logo"/></svg>AFATI <span style="color:var(--accent)">Tablero</span> <small id="actualizado"></small></div>
+        <div class="esp"></div>
+        <button class="icono" id="tema" title="Cambiar tema" aria-label="Cambiar tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <button class="icono" id="salir" title="Salir" aria-label="Salir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Marca"></div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="resumen" aria-selected="true">Resumen</button>
+        <button role="tab" data-tab="contenido">Contenido</button>
+        <button role="tab" data-tab="recs">Recomendaciones</button>
+        <button role="tab" data-tab="ideas">Ideas y pruebas</button>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="vista"></main>
+  <footer class="wrap">Grupo AFATI · Datos de Instagram, Facebook y YouTube vía n8n · TikTok y negocio desde la hoja del playbook</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = (n) => (n == null || isNaN(n)) ? '—' : Math.round(n).toLocaleString('es-MX');
+const corto = (n) => n == null ? '—' : n >= 1e6 ? (n / 1e6).toFixed(1) + ' M' : n >= 1e4 ? (n / 1e3).toFixed(0) + ' mil' : fmt(n);
+const pct = (x) => x == null || isNaN(x) ? '—' : (x * 100).toFixed(x < 0.1 ? 1 : 0) + '%';
+const fecha = (s) => s ? new Date(s).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }) : '';
+const guardar = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+const cargar = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const RED = { instagram: ['Instagram', 'var(--s-ig)'], facebook: ['Facebook', 'var(--s-fb)'], youtube: ['YouTube', 'var(--s-yt)'], tiktok: ['TikTok', 'var(--s-tt)'] };
+const ETAPAS = ['Idea', 'Guion', 'Producido', 'Revisado', 'Aprobado', 'Publicado'];
+const TIPO = { arregla: 'Arreglar', repite: 'Repetir', prueba: 'Probar', organiza: 'Organizar', dato: 'Dato' };
+
+// ---------- tema ----------
+const aplicarTema = (t) => { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; };
+aplicarTema(cargar('tablero-tema'));
+$('#tema').onclick = () => {
+  const oscuro = (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+  const t = oscuro ? 'light' : 'dark'; aplicarTema(t); guardar('tablero-tema', t);
+};
+
+// ---------- descifrado ----------
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function descifrar(sobre, clave) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(clave), 'PBKDF2', false, ['deriveKey']);
+  const llave = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(sobre.sal), iterations: sobre.it, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const plano = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(sobre.iv) }, llave, b64(sobre.datos));
+  return JSON.parse(new TextDecoder().decode(plano));
+}
+let SOBRE = null;
+async function sobre() { if (!SOBRE) SOBRE = await (await fetch('datos.enc?t=' + Date.now(), { cache: 'no-store' })).json(); return SOBRE; }
+async function entrar(clave, recordar) {
+  const datos = await descifrar(await sobre(), clave);
+  if (recordar) guardar('tablero-clave', clave);
+  iniciar(datos);
+}
+$('#f-acceso').onsubmit = async (e) => {
+  e.preventDefault(); $('#err').textContent = '';
+  try { await entrar($('#clave').value, $('#recordar').checked); }
+  catch (er) { $('#err').textContent = er.name === 'OperationError' ? 'Contraseña incorrecta.' : 'No pude cargar los datos (' + er.message + ').'; }
+};
+$('#salir').onclick = () => { guardar('tablero-clave', null); location.reload(); };
+const guardada = cargar('tablero-clave');
+if (guardada) entrar(guardada, true).catch(() => guardar('tablero-clave', null));
+
+// ---------- estado ----------
+let D, marcaSel = cargar('tablero-marca') || 'todas', tab = cargar('tablero-tab') || 'resumen';
+const filtro = { etapa: 'todas', orden: 'fecha', red: 'todas' };
+const marcas = () => Object.entries(D.marcas).filter(([k]) => marcaSel === 'todas' || k === marcaSel);
+const videosSel = () => marcas().flatMap(([k, m]) => m.videos.map((v) => ({ ...v, _m: k, _c: m.color, _n: m.nombre })));
+
+function iniciar(datos) {
+  D = datos; if (marcaSel !== 'todas' && !D.marcas[marcaSel]) marcaSel = 'todas';
+  $('#acceso').hidden = true; $('#app').hidden = false;
+  $('#actualizado').textContent = 'Actualizado ' + new Date(D.generado).toLocaleString('es-MX', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const ch = [['todas', 'Todas', 'var(--text)', '']].concat(Object.entries(D.marcas).map(([k, m]) => [k, m.nombre, m.color, m.tipo === 'propia' ? 'propia' : 'cliente']));
+  $('#chips').innerHTML = ch.map(([k, n, c, t]) => `<button class="chip" data-m="${k}" aria-pressed="${k === marcaSel}"><span class="pt" style="background:${c}"></span>${esc(n)}${t ? ` <em>${t}</em>` : ''}</button>`).join('');
+  $('#chips').onclick = (e) => { const b = e.target.closest('[data-m]'); if (!b) return; marcaSel = b.dataset.m; guardar('tablero-marca', marcaSel); [...$('#chips').children].forEach((x) => x.setAttribute('aria-pressed', x === b)); pintar(); };
+  document.querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => { tab = b.dataset.tab; guardar('tablero-tab', tab); pintar(); scrollTo(0, 0); });
+  pintar();
+}
+
+function pintar() {
+  document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === tab));
+  const avisos = [D.aviso, ...marcas().flatMap(([, m]) => m.errores || [])].filter(Boolean);
+  const html = { resumen, contenido, recs, ideas }[tab]();
+  $('#vista').innerHTML = (avisos.length ? `<div class="aviso">⚠ ${avisos.map(esc).join('<br>')}</div>` : '') + html;
+  if (tab === 'contenido') enlazarFiltros();
+}
+
+// ---------- cálculos de agregados ----------
+function suma(vids) {
+  const t = { vistas: 0, likes: 0, comentarios: 0, guardados: 0, compartidos: 0, publicados: 0 };
+  for (const v of vids) { for (const k of ['vistas', 'likes', 'comentarios', 'guardados', 'compartidos']) t[k] += v.t[k] || 0; if (v.posts.length) t.publicados++; }
+  t.inter = t.vistas ? (t.likes + t.comentarios + t.guardados + t.compartidos) / t.vistas : null;
+  t.cx1000 = t.vistas ? t.compartidos / t.vistas * 1000 : null;
+  return t;
+}
+function seguidores(m) { return ['instagram', 'facebook', 'youtube', 'tiktok'].reduce((a, r) => a + (m.cuentas[r]?.seguidores || 0), 0); }
+function porRed(vids) {
+  const r = {};
+  for (const v of vids) for (const p of v.posts) { r[p.red] ??= { vistas: 0, posts: 0, likes: 0, compartidos: 0, comentarios: 0 }; r[p.red].vistas += p.vistas || 0; r[p.red].posts++; r[p.red].likes += p.likes || 0; r[p.red].compartidos += p.compartidos || 0; r[p.red].comentarios += p.comentarios || 0; }
+  return r;
+}
+
+// ---------- gráficas SVG ----------
+function lineas(series, { alto = 180, pctY = false, xLbl = (x) => x } = {}) {
+  const todos = series.flatMap((s) => s.puntos);
+  if (!todos.length) return '<div class="vacio">Sin datos todavía.</div>';
+  const W = 600, H = alto, pl = 36, pr = 10, pt = 10, pb = 22;
+  const xs = todos.map((p) => p[0]), ys = todos.map((p) => p[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs) || 1, y1 = pctY ? 1 : Math.max(1, ...ys) * 1.1;
+  const X = (x) => pl + (x1 === x0 ? 0.5 : (x - x0) / (x1 - x0)) * (W - pl - pr), Y = (y) => pt + (1 - y / y1) * (H - pt - pb);
+  let g = '';
+  for (let i = 0; i <= 4; i++) { const v = y1 * i / 4; g += `<line class="grid-l" x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${pl - 6}" y="${Y(v) + 4}" text-anchor="end">${pctY ? Math.round(v * 100) + '%' : corto(v)}</text>`; }
+  const ticks = [...new Set(xs)].sort((a, b) => a - b); const paso = Math.ceil(ticks.length / 6);
+  ticks.forEach((x, i) => { if (i % paso === 0 || i === ticks.length - 1) g += `<text x="${X(x)}" y="${H - 4}" text-anchor="middle">${esc(xLbl(x))}</text>`; });
+  for (const s of series) {
+    if (!s.puntos.length) continue;
+    const d = s.puntos.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join('');
+    g += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><title>${esc(s.nombre)}</title></path>`;
+    if (s.puntos.length < 12) s.puntos.forEach((p) => g += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="${s.color}"><title>${esc(s.nombre)}: ${pctY ? pct(p[1]) : fmt(p[1])}</title></circle>`);
+  }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">${g}</svg><div class="leyenda">${series.map((s) => `<span><i style="background:${s.color}"></i>${esc(s.nombre)}</span>`).join('')}</div>`;
+}
+function barras(filas, max) {
+  max = max || Math.max(1, ...filas.map((f) => f.total));
+  if (!filas.length) return '<div class="vacio">Sin datos todavía.</div>';
+  return `<div class="barras">${filas.map((f) => `<div class="barra-f"><span class="n" title="${esc(f.nombre)}">${esc(f.nombre)}</span><b>${f.etiqueta ?? fmt(f.total)}</b><div class="pista">${(f.partes || [{ v: f.total, c: f.color }]).map((p) => `<span style="width:${p.v / max * 100}%;background:${p.c}" title="${esc(p.t || '')}: ${fmt(p.v)}"></span>`).join('')}</div></div>`).join('')}</div>`;
+}
+
+// ---------- RESUMEN ----------
+function resumen() {
+  const vids = videosSel(), t = suma(vids), ms = marcas();
+  const seg = ms.reduce((a, [, m]) => a + seguidores(m), 0);
+  let h = `<div class="grid g-kpi">
+    ${kpi('Vistas', corto(t.vistas), 'todas las redes')}
+    ${kpi('Seguidores', fmt(seg), 'IG + FB + YouTube')}
+    ${kpi('Videos publicados', fmt(t.publicados), `${vids.filter((v) => !v.posts.length).length} en proceso`)}
+    ${kpi('Interacción', pct(t.inter), 'likes + coment. + guard. + comp. / vistas')}
+    ${kpi('Compartidos', t.cx1000 == null ? '—' : t.cx1000.toFixed(1), 'por cada 1,000 vistas')}
+  </div>`;
+
+  if (marcaSel === 'todas') {
+    h += `<section><div class="sec-h"><h2>Marcas</h2></div><div class="grid g-2">${ms.map(([k, m]) => {
+      const s = suma(m.videos);
+      return `<div class="card marca-card" style="--c:${m.color}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>${esc(m.nombre)}</h3><span class="tag">${m.tipo === 'propia' ? 'Propia' : 'Cliente'}</span></div>
+        <div class="mini"><div><b>${corto(s.vistas)}</b><span>vistas</span></div><div><b>${fmt(seguidores(m))}</b><span>seguidores</span></div><div><b>${s.publicados}</b><span>publicados</span></div></div>
+        ${m.recomendaciones[0] ? `<p style="margin:14px 0 0;font-size:14px"><span class="eyebrow" style="font-size:11px">Lo primero</span><br>${esc(m.recomendaciones[0].titulo)}</p>` : ''}
+        <p style="margin:12px 0 0"><a href="#" data-ir="${k}">Ver ${esc(m.nombre)} →</a></p></div>`;
+    }).join('')}</div></section>`;
+  }
+
+  // Vistas por red
+  const r = porRed(vids);
+  const redes = Object.entries(r).sort((a, b) => b[1].vistas - a[1].vistas);
+  h += `<section><div class="grid g-2">
+    <div class="card"><h2>Vistas por red</h2>${barras(redes.map(([k, x]) => ({ nombre: `${RED[k]?.[0] || k} · ${x.posts} publicaciones`, total: x.vistas, color: RED[k]?.[1] })))}
+      <p class="nota" style="margin:12px 0 0">${redes.length ? 'Promedio por publicación: ' + redes.map(([k, x]) => `${RED[k]?.[0] || k} ${fmt(x.vistas / x.posts)}`).join(' · ') : ''}</p></div>
+    <div class="card"><h2>Seguidores por red</h2>${barras(ms.flatMap(([, m]) => ['instagram', 'facebook', 'youtube', 'tiktok'].filter((x) => m.cuentas[x]).map((x) => ({ nombre: `${ms.length > 1 ? m.nombre + ' · ' : ''}${RED[x][0]}`, total: m.cuentas[x].seguidores, color: RED[x][1] }))))}
+      <p class="nota" style="margin:12px 0 0">TikTok: se captura a mano mientras la app está en Sandbox.</p></div>
+  </div></section>`;
+
+  // Top videos
+  const top = vids.filter((v) => v.t.vistas > 0).sort((a, b) => b.t.vistas - a.t.vistas).slice(0, 8);
+  h += `<section><div class="grid g-2"><div class="card"><h2>Videos con más vistas</h2>${barras(top.map((v) => ({
+    nombre: v.titulo, total: v.t.vistas, partes: ['youtube', 'instagram', 'facebook', 'tiktok'].map((rd) => ({ v: v.posts.filter((p) => p.red === rd).reduce((a, p) => a + (p.vistas || 0), 0), c: RED[rd][1], t: RED[rd][0] })).filter((p) => p.v),
+  })))}<div class="leyenda">${['youtube', 'instagram', 'facebook', 'tiktok'].map((x) => `<span><i style="background:${RED[x][1]}"></i>${RED[x][0]}</span>`).join('')}</div></div>`;
+
+  // Retención (curvas de Facebook)
+  const curvas = vids.flatMap((v) => v.posts.filter((p) => p.curva).map((p) => ({ v, p }))).slice(0, 6);
+  const colores = ['var(--accent)', 'var(--s-ostara)', 'var(--electric)', 'var(--cyan)', 'var(--warn)', 'var(--ok)'];
+  h += `<div class="card"><h2>¿Hasta qué segundo se quedan?</h2>${lineas(curvas.map(({ v, p }, i) => ({ nombre: v.titulo.slice(0, 38), color: colores[i], puntos: p.curva })), { pctY: true, xLbl: (x) => x + ' s' })}
+    <p class="nota" style="margin:10px 0 0">Curva de retención de Facebook (la única red que la entrega por API). Lo ideal: más de 60% al segundo 5.</p></div></div></section>`;
+
+  // Crecimiento
+  const series = [];
+  for (const [, m] of ms) {
+    const dias = Object.keys(m.historial || {}).sort();
+    if (dias.length) series.push({ nombre: m.nombre + ' · seguidores', color: m.color, puntos: dias.map((d) => [new Date(d).getTime(), ['ig', 'fb', 'yt'].reduce((a, r) => a + (m.historial[d][r] || 0), 0)]) });
+  }
+  const nDias = Math.max(0, ...series.map((s) => s.puntos.length));
+  h += `<section><div class="card"><div class="sec-h"><h2>Crecimiento</h2><span class="nota">${nDias} día(s) registrados</span></div>${nDias > 1 ? lineas(series, { xLbl: (x) => fecha(x) }) : '<div class="vacio">El crecimiento se dibuja a partir del segundo día de datos. Cada vez que se actualiza el tablero se guarda una foto de los seguidores.</div>'}</div></section>`;
+  setTimeout(() => document.querySelectorAll('[data-ir]').forEach((a) => a.onclick = (e) => { e.preventDefault(); $(`[data-m="${a.dataset.ir}"]`).click(); }));
+  return h;
+}
+const kpi = (l, v, s) => `<div class="card kpi"><div class="lbl">${l}</div><div class="val">${v}</div><div class="sub">${s}</div></div>`;
+
+// ---------- CONTENIDO ----------
+function contenido() {
+  const todos = videosSel();
+  const cuenta = Object.fromEntries(ETAPAS.map((e) => [e, todos.filter((v) => v.etapa === e).length]));
+  let vids = todos.filter((v) => (filtro.etapa === 'todas' || v.etapa === filtro.etapa) && (filtro.red === 'todas' || v.posts.some((p) => p.red === filtro.red)));
+  vids.sort(filtro.orden === 'vistas' ? (a, b) => b.t.vistas - a.t.vistas : filtro.orden === 'inter' ? (a, b) => (b.t.interaccion || 0) - (a.t.interaccion || 0) : (a, b) => String(b.t.primera_publicacion || b.programado || b.fecha_creado || '').localeCompare(String(a.t.primera_publicacion || a.programado || a.fecha_creado || '')));
+  return `<div class="embudo">${ETAPAS.map((e) => `<button class="paso ${filtro.etapa === e ? 'on' : ''}" data-etapa="${e}"><b>${cuenta[e]}</b><span>${e}</span></button>`).join('')}</div>
+  <div class="filtros">
+    <select id="f-etapa"><option value="todas">Todas las etapas</option>${ETAPAS.map((e) => `<option ${filtro.etapa === e ? 'selected' : ''}>${e}</option>`).join('')}</select>
+    <select id="f-red"><option value="todas">Todas las redes</option>${Object.entries(RED).map(([k, [n]]) => `<option value="${k}" ${filtro.red === k ? 'selected' : ''}>${n}</option>`).join('')}</select>
+    <select id="f-orden"><option value="fecha" ${filtro.orden === 'fecha' ? 'selected' : ''}>Más recientes</option><option value="vistas" ${filtro.orden === 'vistas' ? 'selected' : ''}>Más vistas</option><option value="inter" ${filtro.orden === 'inter' ? 'selected' : ''}>Más interacción</option></select>
+  </div>
+  <div class="videos">${vids.map(tarjeta).join('') || '<div class="vacio">Nada con estos filtros.</div>'}</div>`;
+}
+function tarjeta(v) {
+  const etqs = [['Estilo', v.estilo], ['Tema', v.tema], ['Gancho', v.tipo_gancho], ['Formato', v.formato], ['CTA', v.cta_palabra]].filter(([, x]) => x);
+  const filas = v.posts.map((p) => `<tr><td><a class="red-i" href="${esc(p.url || '#')}" target="_blank" rel="noopener"><i style="background:${RED[p.red]?.[1]}"></i>${RED[p.red]?.[0] || p.red}</a></td><td>${fmt(p.vistas)}</td><td>${fmt(p.likes)}</td><td>${fmt(p.comentarios)}</td><td>${p.compartidos == null ? '—' : fmt(p.compartidos)}</td><td>${p.guardados == null ? '—' : fmt(p.guardados)}</td></tr>`).join('');
+  const fechaTxt = v.t.primera_publicacion ? 'Publicado ' + fecha(v.t.primera_publicacion) : v.programado ? 'Programado ' + fecha(v.programado) : v.fecha_creado ? 'Creado ' + fecha(v.fecha_creado) : '';
+  return `<article class="card vid">
+    <div class="thumb">${v.miniatura ? `<img src="${esc(v.miniatura)}" alt="" loading="lazy">` : `<div class="sin"><svg aria-hidden="true" style="color:var(--accent-strong)"><use href="#logo"/></svg></div>`}
+      <span class="tag estado e-${esc(v.etapa)}">${esc(v.etapa)}</span>${marcaSel === 'todas' ? `<span class="marca-b" style="--c:${v._c}">${esc(v._n)}</span>` : ''}</div>
+    <div class="cuerpo">
+      <h3>${esc(v.titulo)}</h3>
+      ${v.externo ? '<div class="nota">Publicado fuera del sistema (a mano)</div>' : ''}
+      ${etqs.length ? `<div class="etqs">${etqs.map(([k, x]) => `<span class="etq">${k}: <b>${esc(x)}</b></span>`).join('')}</div>` : ''}
+      ${v.gancho_texto ? `<div class="nota">«${esc(v.gancho_texto)}»</div>` : ''}
+      ${filas ? `<table class="redes"><thead><tr><th>Red</th><th>Vistas</th><th>Likes</th><th>Com.</th><th>Comp.</th><th>Guard.</th></tr></thead><tbody>${filas}</tbody></table>` : ''}
+      <div class="pie"><span>${esc(fechaTxt)}</span>${v.t.vistas ? `<span>Interacción <b>${pct(v.t.interaccion)}</b></span>` : ''}${v.t.retencion_pct ? `<span>Retención <b>${pct(v.t.retencion_pct)}</b></span>` : ''}</div>
+    </div></article>`;
+}
+function enlazarFiltros() {
+  const set = (k, val) => { filtro[k] = val; pintar(); };
+  $('#f-etapa').onchange = (e) => set('etapa', e.target.value);
+  $('#f-red').onchange = (e) => set('red', e.target.value);
+  $('#f-orden').onchange = (e) => set('orden', e.target.value);
+  document.querySelectorAll('[data-etapa]').forEach((b) => b.onclick = () => set('etapa', filtro.etapa === b.dataset.etapa ? 'todas' : b.dataset.etapa));
+}
+
+// ---------- RECOMENDACIONES ----------
+function recs() {
+  const ms = marcas();
+  const lista = ms.flatMap(([, m]) => m.recomendaciones.map((r) => ({ ...r, _n: m.nombre }))).sort((a, b) => a.prioridad - b.prioridad);
+  let h = `<p class="nota" style="margin:0 0 16px">Se calculan con sus números en cada actualización. Con menos de 5 videos medidos son señales, no conclusiones.</p>
+  <div class="recs">${lista.map((r) => `<div class="card rec t-${r.tipo}"><span class="ti">${TIPO[r.tipo] || r.tipo}</span><div>
+    ${ms.length > 1 ? `<span class="quien">${esc(r._n)}</span>` : ''}<h3>${esc(r.titulo)}</h3><p>${esc(r.detalle)}</p>${r.evidencia ? `<span class="ev">${esc(r.evidencia)}</span>` : ''}</div></div>`).join('') || '<div class="vacio">Sin recomendaciones.</div>'}</div>`;
+  h += ms.map(([, m]) => `<section><div class="sec-h"><h2>Playbook · ${esc(m.nombre)}</h2></div><div class="grid g-2">
+    <div class="card md"><h3 style="color:var(--ok)">Lo que funciona</h3>${md(m.playbook.funciona)}</div>
+    <div class="card md"><h3 style="color:var(--bad)">Lo que no funciona</h3>${md(m.playbook.no_funciona)}<h3>Mejores horarios</h3>${md(m.playbook.horarios)}</div></div></section>`).join('');
+  return h;
+}
+
+// ---------- IDEAS ----------
+function ideas() {
+  return marcas().map(([, m]) => `<section style="margin-top:0;margin-bottom:28px"><div class="sec-h"><h2>${esc(m.nombre)}</h2></div><div class="grid g-2">
+    <div class="card md">${m.notas ? md(m.notas) : '<div class="vacio">Sin notas todavía.</div>'}</div>
+    <div class="grid" style="align-content:start">
+      <div class="card md"><h3>Mezcla de la semana</h3>${md(m.estrategia.mezcla) || '<div class="vacio">—</div>'}</div>
+      ${m.investigacion.length ? `<div class="card md"><h3>Ideas propuestas por el investigador</h3>${m.investigacion.map((i) => `<h4>${esc(i.archivo.replace('.md', ''))}</h4><ul>${i.ideas.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</div>` : ''}
+      <div class="card md"><h3>Objetivo</h3>${md(m.estrategia.objetivo)}</div>
+    </div></div></section>`).join('');
+}
+
+// ---------- markdown mínimo ----------
+function md(txt) {
+  if (!txt) return '';
+  const inl = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  let h = '', enLista = false;
+  for (const l of txt.split('\n')) {
+    const t = l.trim();
+    if (/^[-*]\s+/.test(t) || /^\d+\.\s+/.test(t)) { if (!enLista) { h += '<ul>'; enLista = true; } h += '<li>' + inl(t.replace(/^([-*]|\d+\.)\s+/, '')) + '</li>'; continue; }
+    if (enLista) { h += '</ul>'; enLista = false; }
+    if (!t || t.startsWith('|')) continue;
+    if (t.startsWith('### ')) h += '<h4>' + inl(t.slice(4)) + '</h4>';
+    else if (t.startsWith('## ')) h += '<h3>' + inl(t.slice(3)) + '</h3>';
+    else if (t.startsWith('# ')) continue;
+    else h += '<p>' + inl(t) + '</p>';
+  }
+  return h + (enLista ? '</ul>' : '');
+}
+})();
+</script>
+</body>
+</html>
