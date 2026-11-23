@@ -171,6 +171,25 @@ section{margin-top:28px}
 .md p{margin:8px 0}
 .md code{background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:.9em}
 .vacio{color:var(--faint);font-size:14px;padding:12px 0}
+
+/* tendencias */
+.red-card{border-top:4px solid var(--c)}
+.red-card h3{font-size:22px;text-transform:uppercase;letter-spacing:.06em}
+.idea-t,.tend,.viral{display:flex;flex-direction:column;gap:8px}
+.idea-t{border-left:4px solid var(--c)}
+.idea-t h3,.tend h3,.viral h3{font-size:19px;line-height:1.2}
+.tend p,.viral p,.idea-t p{margin:0;font-size:15px}
+.gancho{font-style:italic;color:var(--accent-strong)}
+.usar{background:var(--accent-soft);border-radius:var(--radius);padding:8px 10px;font-size:14px!important}
+.ejs{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.ejs a,.viral h3 a{overflow-wrap:anywhere}
+.est{display:inline-block;font:600 11px var(--font-head);letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.est-llegando{background:var(--electric);color:#fff}.est-subiendo{background:var(--ok);color:#fff}.est-pico{background:var(--warn);color:#fff}.est-bajando{background:var(--surface-2);color:var(--faint)}
+.urg-0{background:color-mix(in srgb,var(--bad) 16%,var(--surface));color:var(--bad)}.urg-0 b{color:var(--bad)}
+.pt-r{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+details.card summary{cursor:pointer;list-style:none}
+details.card summary::-webkit-details-marker{display:none}
+details.card[open] summary{margin-bottom:10px}
 footer{color:var(--faint);font-size:12px;text-align:center;padding:24px 0 40px}
 @media (max-width:520px){.kpi .val{font-size:30px}.marca-t small{display:none}}
 </style>
@@ -210,6 +229,7 @@ footer{color:var(--faint);font-size:12px;text-align:center;padding:24px 0 40px}
         <button role="tab" data-tab="contenido">Contenido</button>
         <button role="tab" data-tab="recs">Recomendaciones</button>
         <button role="tab" data-tab="ideas">Ideas y pruebas</button>
+        <button role="tab" data-tab="tendencias">Tendencias</button>
       </nav>
     </div>
   </header>
@@ -284,9 +304,10 @@ function iniciar(datos) {
 function pintar() {
   document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === tab));
   const avisos = [D.aviso, ...marcas().flatMap(([, m]) => m.errores || [])].filter(Boolean);
-  const html = { resumen, contenido, recs, ideas }[tab]();
+  const html = ({ resumen, contenido, recs, ideas, tendencias }[tab] || resumen)();
   $('#vista').innerHTML = (avisos.length ? `<div class="aviso">⚠ ${avisos.map(esc).join('<br>')}</div>` : '') + html;
   if (tab === 'contenido') enlazarFiltros();
+  if (tab === 'tendencias') document.querySelectorAll('[data-red-t]').forEach((b) => b.onclick = () => { redT = b.dataset.redT; guardar('tablero-red-t', redT); pintar(); });
 }
 
 // ---------- cálculos de agregados ----------
@@ -447,6 +468,79 @@ function ideas() {
       ${m.investigacion.length ? `<div class="card md"><h3>Ideas propuestas por el investigador</h3>${m.investigacion.map((i) => `<h4>${esc(i.archivo.replace('.md', ''))}</h4><ul>${i.ideas.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</div>` : ''}
       <div class="card md"><h3>Objetivo</h3>${md(m.estrategia.objetivo)}</div>
     </div></div></section>`).join('');
+}
+
+// ---------- TENDENCIAS (exploradores diarios) ----------
+const REDT = { reels: ['Reels · IG y FB', 'var(--s-ig)'], shorts: ['YouTube Shorts', 'var(--s-yt)'], tiktok: ['TikTok', 'var(--s-tt)'] };
+const URG = { 'hoy': 0, 'esta semana': 1, 'siempre': 2 };
+let redT = cargar('tablero-red-t') || 'todas';
+const lnk = (u, t) => /^https?:\/\//.test(u || '') ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t || u)}</a>` : esc(t || '');
+const estadoT = (e) => `<span class="est est-${esc(String(e || '').replace(/\s/g, ''))}">${esc(e || '—')}</span>`;
+
+function ideaHTML(i, red) {
+  const m = D.marcas[i.marca];
+  return `<div class="card idea-t" style="--c:${m ? m.color : 'var(--accent)'}">
+    <div class="etqs">${m ? `<span class="tag" style="background:${m.color};color:#fff">${esc(m.nombre)}</span>` : ''}<span class="etq urg-${URG[i.urgencia] ?? 2}"><b>${esc(i.urgencia || 'siempre')}</b></span>${red ? `<span class="etq"><i class="pt-r" style="background:${REDT[red][1]}"></i>${esc(REDT[red][0])}</span>` : ''}${i.formato ? `<span class="etq">${esc(i.formato)}</span>` : ''}</div>
+    <h3>${esc(i.titulo)}</h3>
+    ${i.gancho ? `<p class="gancho">«${esc(i.gancho)}»</p>` : ''}
+    <p class="nota" style="margin:0">${esc(i.por_que || '')}${i.basada_en ? ` · Basada en: ${esc(i.basada_en)}` : ''}</p></div>`;
+}
+function ideasDe(reds) {
+  const out = [];
+  for (const r of reds) for (const i of (D.tendencias[r].ideas || [])) if (marcaSel === 'todas' || i.marca === marcaSel) out.push([i, r]);
+  return out.sort((a, b) => (URG[a[0].urgencia] ?? 2) - (URG[b[0].urgencia] ?? 2));
+}
+function tendHTML(t) {
+  return `<div class="card tend">
+    <div class="etqs">${estadoT(t.estado)}<span class="etq">${esc(t.tipo || '')}</span>${t.dias_vista > 1 ? `<span class="etq"><b>${t.dias_vista}</b> días</span>` : '<span class="etq">nueva</span>'}${t.confianza ? `<span class="etq">confianza <b>${esc(t.confianza)}</b></span>` : ''}</div>
+    <h3>${esc(t.nombre)}</h3>
+    <p>${esc(t.descripcion || '')}</p>
+    ${t.por_que_funciona ? `<p class="nota" style="margin:0"><b>Por qué funciona:</b> ${esc(t.por_que_funciona)}</p>` : ''}
+    ${t.como_usarlo ? `<p class="usar"><b>Cómo usarlo:</b> ${esc(t.como_usarlo)}</p>` : ''}
+    ${(t.ejemplos || []).length ? `<ul class="ejs">${t.ejemplos.map((e) => `<li>${lnk(e.url, e.cuenta || 'ver')}${e.vistas ? ` · ${esc(e.vistas)}` : ''}${e.nota ? ` — ${esc(e.nota)}` : ''}</li>`).join('')}</ul>` : ''}
+  </div>`;
+}
+function tendencias() {
+  const T = D.tendencias || {};
+  const reds = Object.keys(REDT).filter((r) => T[r]);
+  if (!reds.length) return '<div class="card vacio">Los exploradores todavía no entregan su primer reporte. Cada mañana revisan Reels, Shorts y TikTok y aquí aparecen tendencias, virales e ideas.</div>';
+  if (redT !== 'todas' && !T[redT]) redT = 'todas';
+  let h = `<div class="chips" style="margin:0 0 18px;padding:0">${[['todas', 'Todas las redes', 'var(--text)'], ...reds.map((r) => [r, REDT[r][0], REDT[r][1]])].map(([k, n, c]) => `<button class="chip" data-red-t="${k}" aria-pressed="${k === redT}"><span class="pt" style="background:${c}"></span>${esc(n)}</button>`).join('')}</div>`;
+  const sel = redT === 'todas' ? reds : [redT];
+
+  // Resumen del día por red
+  h += `<div class="grid g-2">${sel.map((r) => { const x = T[r]; return `<div class="card red-card" style="--c:${REDT[r][1]}">
+    <div class="sec-h" style="margin-bottom:6px"><h3>${esc(REDT[r][0])}</h3><span class="nota">${esc(fecha(x.fecha + 'T12:00'))} · ${esc(x.metodo || '')}</span></div>
+    <p style="margin:0 0 10px">${esc(x.resumen || '')}</p>
+    ${x.constantes?.length ? `<div class="etqs">${x.constantes.slice(0, 6).map((c) => `<span class="etq"><b>${c.dias}d</b> ${esc(c.nombre)}</span>`).join('')}</div>` : ''}
+  </div>`; }).join('')}</div>`;
+
+  // Ideas
+  const ids = ideasDe(sel);
+  h += `<section><div class="sec-h"><h2>Ideas para producir</h2><span class="nota">${ids.length} idea(s)${marcaSel !== 'todas' ? ' · ' + esc(D.marcas[marcaSel]?.nombre || '') : ''}</span></div>
+    <div class="videos">${ids.map(([i, r]) => ideaHTML(i, sel.length > 1 ? r : null)).join('') || '<div class="vacio">Sin ideas para esta marca hoy.</div>'}</div></section>`;
+
+  for (const r of sel) {
+    const x = T[r];
+    const pre = sel.length > 1 ? ` · ${esc(REDT[r][0])}` : '';
+    h += `<section><div class="sec-h"><h2>Tendencias${pre}</h2></div><div class="videos">${(x.tendencias || []).map(tendHTML).join('') || '<div class="vacio">—</div>'}</div></section>`;
+    h += `<section><div class="sec-h"><h2>Videos virales${pre}</h2></div><div class="grid g-2">${(x.virales || []).map((v) => `<div class="card viral">
+      <div class="etqs">${v.vistas ? `<span class="etq"><b>${esc(v.vistas)}</b> vistas</span>` : ''}${v.duracion_s ? `<span class="etq">${esc(v.duracion_s)} s</span>` : ''}${v.cuenta ? `<span class="etq">${esc(v.cuenta)}</span>` : ''}</div>
+      <h3>${lnk(v.url, v.titulo || 'Ver video')}</h3>
+      ${v.gancho ? `<p class="gancho">«${esc(v.gancho)}»</p>` : ''}
+      ${v.estructura ? `<p class="nota" style="margin:0">${esc(v.estructura)}</p>` : ''}
+      ${v.por_que ? `<p style="margin:0">${esc(v.por_que)}</p>` : ''}
+      ${v.leccion ? `<p class="usar"><b>Lección:</b> ${esc(v.leccion)}</p>` : ''}</div>`).join('') || '<div class="vacio">—</div>'}</div></section>`;
+    h += `<section><div class="grid g-2">
+      <div class="card md"><h3>Ganchos que funcionan</h3>${(x.ganchos || []).length ? `<ul>${x.ganchos.map((g) => `<li>${esc(g)}</li>`).join('')}</ul>` : '<div class="vacio">—</div>'}</div>
+      <div class="card md"><h3>Audios</h3>${(x.audios || []).length ? `<ul>${x.audios.map((a) => `<li>${lnk(a.url, a.nombre)} ${estadoT(a.estado)}${a.uso ? ` — ${esc(a.uso)}` : ''}</li>`).join('')}</ul>` : '<div class="vacio">Sin audios reportados.</div>'}
+        ${(x.aprendizajes || []).length ? `<h3>Aprendido hoy</h3><ul>${x.aprendizajes.map((a) => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}</div>
+    </div></section>`;
+    h += `<section><details class="card md"><summary><b>Bitácora de aprendizaje${pre}</b> <span class="nota">— lo que el explorador ha ido confirmando día con día</span></summary>${md(x.aprendizajes_md) || '<div class="vacio">—</div>'}
+      ${x.anteriores?.length ? `<h3>Días anteriores</h3>${x.anteriores.map((a) => `<h4>${esc(fecha(a.fecha + 'T12:00'))}</h4><p>${esc(a.resumen)}</p>`).join('')}` : ''}
+      ${x.notas_de_proceso ? `<p class="nota">${esc(x.notas_de_proceso)}</p>` : ''}</details></section>`;
+  }
+  return h;
 }
 
 // ---------- markdown mínimo ----------
